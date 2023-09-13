@@ -1,17 +1,30 @@
 import React, { useState } from 'react'
-import { useFirebase } from "../context/Firebase";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 const Register = () => {
-    const firebase = useFirebase();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState(null);
+
+    const auth = getAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("working")
-        await firebase.signupUserWithEmailAndPassword(email, password);
-        console.log("success")
+        try {
+            // Create a new user account with email and password
+            const signupUserWithEmailAndPassword = await createUserWithEmailAndPassword(auth, email, password);
+            const user = signupUserWithEmailAndPassword.user;
+
+            // Handle successful user creation (e.g., navigate to another page)
+            console.log("User created:", user.email);
+        } catch (error) {
+            // Handle user creation errors
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            setError(errorMessage);
+            console.error("User creation error:", errorCode, errorMessage);
+        }
     };
 
     return (
