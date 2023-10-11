@@ -1,6 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { createContext, useContext } from 'react';
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth } from "firebase/auth";
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/firestore';
 
 const FirebaseContext = createContext(null);
 

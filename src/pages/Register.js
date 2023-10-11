@@ -1,13 +1,30 @@
-import React, { useState } from 'react'
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from "react-router-dom";
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 const Register = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [user, setUser] = useState("");
     const [error, setError] = useState(null);
 
     const auth = getAuth();
+    const navigate = useNavigate();
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) setUser(user)
+            else setUser(null)
+            console.log("User", user)
+        });
+    }, [])
+
+    const isLoggedIn = user ? true : false;
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate("/")
+        }
+    })
 
     const handleSubmit = async (e) => {
         e.preventDefault();

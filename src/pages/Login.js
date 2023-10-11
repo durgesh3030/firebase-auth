@@ -1,21 +1,42 @@
-import React, { useState } from 'react'
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from "react-router-dom";
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 
 const auth = getAuth();
+const googleProvider = new GoogleAuthProvider();
 
 
 const Login = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) setUser(user)
+            else setUser(null)
+            console.log("User", user)
+        });
+    }, [])
+
+    const isLoggedIn = user ? true : false;
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate("/")
+        }
+    })
+
+    const signinWithGoogle = () => signInWithPopup(auth, googleProvider)
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             // Sign in with email and password
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
+            const signinWithEmailAndPassword = await signInWithEmailAndPassword(auth, email, password);
+            const user = signinWithEmailAndPassword.user;
 
             // Handle successful sign-in (e.g., navigate to another page)
             console.log("Signed in as:", user.email);
@@ -90,19 +111,21 @@ const Login = () => {
                                 </button>
                             </form>
                             <button type="submit"
+                                onClick={signinWithGoogle}
                                 className="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none
                                  focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700
                                   dark:focus:ring-primary-800">
                                 Log In with Google
                             </button>
                             <button type="submit"
-                                className="w-full text-white bg-green-400 hover:bg-red-700 focus:ring-4 focus:outline-none
+
+                                className="w-full text-white bg-green-400 hover:bg-green-700 focus:ring-4 focus:outline-none
                                  focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700
                                   dark:focus:ring-primary-800">
                                 Log In with Microsoft
                             </button>
                             <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                Don’t have an account yet?
+                                Don’t have an account yet? .
                                 <a href="register" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
                                     Sign up
                                 </a>
